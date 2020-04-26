@@ -10,9 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
-      DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
       DOCKER_HUB_REGISTRY: docker.pkg.github.com
-      APP_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/rabbit-hole-github-actions/github-actions-production
+      APP_NAME: kamlesh07/rabbit-hole-github-actions/github-actions-production
       VERSION: ${{ github.sha }}
     steps:
       - name: Checkout Codebase
@@ -32,8 +31,8 @@ jobs:
           docker build . \
           --file ./Dockerfile \
           --build-arg STAGE=production \
-          --tag ${APP_NAME}:${VERSION}
+          --tag ${DOCKER_HUB_REGISTRY}/${APP_NAME}:${VERSION}
       - name: Push to Docker Hub
         run: |
-          docker login ${DOCKER_HUB_REGISTRY} --username ${DOCKER_HUB_USERNAME} --password ${DOCKER_HUB_PASSWORD}
+          docker login ${DOCKER_HUB_REGISTRY} --username ${DOCKER_HUB_USERNAME} --password ${{ secrets.GITHUB_TOKEN }}
           docker push ${DOCKER_HUB_REGISTRY}/${APP_NAME}:${VERSION}
