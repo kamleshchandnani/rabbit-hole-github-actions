@@ -1,0 +1,37 @@
+name: Production Deploy
+
+on: deployment
+
+env:
+  NPM_RAZORPAY_TOKEN: ${{ secrets.NPM_RAZORPAY_TOKEN }}
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    if: github.event.deployment.environment == 'production' && github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+      - name: Use Node v12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Run Tests
+        run: yarn test
+      - name: Build
+        run: yarn staging
+      - name: Deploy to Kubernetes Cluster
+        run: echo ${{ github.ref }} ${{ github.event.deployment.environment }} ${{ github.event.deployment.id }}
+      - name: Mark Deployment Success on GitHub
+        run: |
+          curl --location --request POST 'https://api.github.com/repos/razorpay/frontend-graphql/deployments/${{ github.event.deployment.id }}/statuses' \
+          --header 'Authorization: token ${{ github.token }}' \
+          --header 'Accept: application/vnd.github.everest-preview+json' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+            "environment": "production",
+            "state": "success"
+          }'

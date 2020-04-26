@@ -1,0 +1,30 @@
+{
+  "name": "rabbit-hole-github-actions",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "repository": "git@github.com:kamleshchandnani/rabbit-hole-github-actions.git",
+  "author": "kamleshchandnani <kamlesh.chandnani@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "yarn development",
+    "lint": "eslint \"src/**\"",
+    "test": "echo test",
+    "development": "STAGE=development nodemon src/index.js",
+    "staging": "STAGE=staging node src/index.js",
+    "production": "STAGE=production node src/index.js"
+  },
+  "dependencies": {
+    "chalk": "4.0.0",
+    "connect-slashes": "1.4.0",
+    "cookie-parser": "1.4.5",
+    "eslint": "6.8.0",
+    "eslint-config-kentcdodds": "14.8.1",
+    "eslint-config-prettier": "6.11.0",
+    "eslint-plugin-prettier": "3.1.3",
+    "eslint-plugin-react": "7.19.0",
+    "express": "4.17.1",
+    "helmet": "3.22.0",
+    "nodemon": "2.0.3",
+    "prettier": "2.0.5"
+  }
+}

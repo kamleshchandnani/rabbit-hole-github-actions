@@ -1,0 +1,38 @@
+name: Staging Build
+
+on:
+  push:
+    branches: [release/*]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+      DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
+      APP_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/rabbit-hole-github-actions
+      VERSION: staging-${{ github.sha }}
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+      - name: Use Node v12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Run Tests
+        run: yarn test
+      - name: Build Application
+        run: yarn staging
+      - name: Build Docker Image
+        run: |
+          docker build . \
+          --file ./Dockerfile \
+          --build-arg STAGE=staging \
+          --tag ${APP_NAME}:${VERSION}
+      - name: Push to Docker Hub
+        run: |
+          docker login ${DOCKER_HUB_REGISTRY} --username ${DOCKER_HUB_USERNAME} --password ${DOCKER_HUB_PASSWORD}
+          docker push ${APP_NAME}:${VERSION}
