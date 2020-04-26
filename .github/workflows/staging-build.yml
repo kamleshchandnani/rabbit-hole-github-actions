@@ -11,7 +11,7 @@ jobs:
     env:
       DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
       DOCKER_HUB_REGISTRY: docker.pkg.github.com
-      APP_NAME: kamlesh07/rabbit-hole-github-actions/github-actions-staging
+      APP_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/rabbit-hole-github-actions/github-actions-staging
       VERSION: ${{ github.sha }}
     steps:
       - name: Checkout Codebase
