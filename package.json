@@ -10,8 +10,10 @@
     "lint": "eslint \"src/**\"",
     "test": "echo test",
     "development": "STAGE=development nodemon src/index.js",
-    "staging": "STAGE=staging node src/index.js",
-    "production": "STAGE=production node src/index.js"
+    "staging:build": "STAGE=staging echo \"staging app built\"",
+    "staging:serve": "STAGE=staging node src/index.js",
+    "production:build": "STAGE=production echo \"production app built\"",
+    "production:serve": "STAGE=production node src/index.js"
   },
   "dependencies": {
     "chalk": "4.0.0",

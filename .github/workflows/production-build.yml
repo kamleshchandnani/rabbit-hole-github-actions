@@ -4,9 +4,6 @@ on:
   push:
     branches: [master]
 
-env:
-  NPM_RAZORPAY_TOKEN: ${{ secrets.NPM_RAZORPAY_TOKEN }}
-
 jobs:
   build:
     name: Build
@@ -14,8 +11,9 @@ jobs:
     env:
       DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
       DOCKER_HUB_PASSWORD: ${{ secrets.DOCKER_HUB_PASSWORD }}
-      APP_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/rabbit-hole-github-actions
-      VERSION: production-${{ github.sha }}
+      DOCKER_HUB_REGISTRY: docker.pkg.github.com
+      APP_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/rabbit-hole-github-actions/github-actions-production
+      VERSION: ${{ github.sha }}
     steps:
       - name: Checkout Codebase
         uses: actions/checkout@v2
@@ -28,7 +26,7 @@ jobs:
       - name: Run Tests
         run: yarn test
       - name: Build Application
-        run: yarn production
+        run: yarn production:build
       - name: Build Docker Image
         run: |
           docker build . \
@@ -38,4 +36,4 @@ jobs:
       - name: Push to Docker Hub
         run: |
           docker login ${DOCKER_HUB_REGISTRY} --username ${DOCKER_HUB_USERNAME} --password ${DOCKER_HUB_PASSWORD}
-          docker push ${APP_NAME}:${VERSION}
+          docker push ${DOCKER_HUB_REGISTRY}/${APP_NAME}:${VERSION}

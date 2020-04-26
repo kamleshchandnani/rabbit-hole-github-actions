@@ -19,12 +19,12 @@ jobs:
       - name: Test
         run: yarn test
       - name: Build
-        run: yarn staging
+        run: yarn staging:build
       - name: Deploy to Kubernetes Cluster
         run: echo ${{ github.ref }} ${{ github.event.deployment.environment }} ${{ github.event.deployment.id }}
       - name: Mark Deployment Success on GitHub
         run: |
-          curl --location --request POST 'https://api.github.com/repos/razorpay/frontend-graphql/deployments/${{ github.event.deployment.id }}/statuses' \
+          curl --location --request POST 'https://api.github.com/repos/kamleshchandnani/rabbit-hole-github-actions/deployments/${{ github.event.deployment.id }}/statuses' \
           --header 'Authorization: token ${{ github.token }}' \
           --header 'Accept: application/vnd.github.everest-preview+json' \
           --header 'Content-Type: application/json' \

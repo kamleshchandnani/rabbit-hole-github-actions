@@ -19,9 +19,12 @@ RUN yarn install --frozen-lockfile
 # Copy app source
 COPY --chown=node:node . ./
 
+# build the app source. This command will run during docker build
+RUN yarn $STAGE:build
+
 
 # serve the app. This command will run during docker run
-CMD yarn $STAGE
+CMD yarn $STAGE:serve
 
 
 # docker build \
