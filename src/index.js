@@ -39,7 +39,7 @@ const makeApp = ({ name, version }) => {
   app.use(slashes(true));
   app.use('*', (req, res) =>
     res.send({
-      data: 'Simple express app',
+      data: 'Simple express server app',
     }),
   );
 
