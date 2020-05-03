@@ -1,6 +1,6 @@
 {
   "name": "rabbit-hole-github-actions",
-  "version": "1.0.1-beta.0",
+  "version": "1.0.1-beta.1",
   "main": "src/index.js",
   "repository": "git@github.com:kamleshchandnani/rabbit-hole-github-actions.git",
   "author": "kamleshchandnani <kamlesh.chandnani@gmail.com>",
