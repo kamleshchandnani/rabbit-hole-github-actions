@@ -103,6 +103,8 @@ jobs:
   version-publish:
     name: Version Publish
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
     needs: [staging-build, production-build]
     steps:
       - name: Checkout Codebase
@@ -112,11 +114,12 @@ jobs:
         with:
           node-version: 12
       - name: Bump package.json Version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
         run: |
           git config --global user.email "kamlesh.chandnani@gmail.com"
           git config --global user.name "kamleshchandnani"
           yarn version:bump
+          cat package.json
       - name: Publish Version
-        run: yarn version:publish
+        run: |
+          cat package.json
+          yarn version:publish
