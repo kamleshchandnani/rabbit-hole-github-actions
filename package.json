@@ -10,7 +10,7 @@
     "lint": "eslint \"src/**\"",
     "test": "echo test",
     "development": "STAGE=development nodemon src/index.js",
-    "version:bump": "yarn semantic-release",
+    "version:bump": "npx semantic-release",
     "version:publish": "git push && git push --tags",
     "staging:build": "STAGE=staging echo \"staging app built\"",
     "staging:serve": "STAGE=staging node src/index.js",
