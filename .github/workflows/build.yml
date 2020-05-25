@@ -118,8 +118,6 @@ jobs:
           git config --global user.email "kamlesh.chandnani@gmail.com"
           git config --global user.name "kamleshchandnani"
           yarn version:bump
-          cat package.json
       - name: Publish Version
         run: |
-          cat package.json
           yarn version:publish
