@@ -38,7 +38,7 @@ jobs:
         run: yarn production:build
       - name: Bump package.json Version
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
         run: |
           git config --global user.email "kamlesh.chandnani@gmail.com"
           git config --global user.name "kamleshchandnani"
@@ -113,7 +113,7 @@ jobs:
           node-version: 12
       - name: Bump package.json Version
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
         run: |
           git config --global user.email "kamlesh.chandnani@gmail.com"
           git config --global user.name "kamleshchandnani"
