@@ -1,0 +1,76 @@
+name: Deploy
+
+on: deployment
+
+jobs:
+  release-deploy:
+    name: Release Deploy
+    runs-on: ubuntu-latest
+    if: github.event.deployment.environment == 'release'
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+      - name: Use Node v12
+        uses: actions/setup-node
+        with:
+          node-version: 12
+      - name: Deploy To Kubernetes Cluster
+        run: echo "deploying to kubernetes"
+      - name: Mark Deployment success on GitHub
+        run: |
+          curl --location --request POST 'https://api.github.com/repos/kamleshchandnani/rabbit-hole-github-actions/deployments/${{ github.event.deployment.id }}/statuses' \
+          --header 'Authorization: token ${{ github.token }}' \
+          --header 'Accept: application/vnd.github.everest-preview+json' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+            "environment": "release",
+            "state": "success"
+          }'
+
+  staging-deploy:
+    name: Staging Deploy
+    runs-on: ubuntu-latest
+    if: github.event.deployment.environment == 'staging'
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+      - name: Use Node v12
+        uses: actions/setup-node
+        with:
+          node-version: 12
+      - name: Deploy To Kubernetes Cluster
+        run: echo "deploying to kubernetes"
+      - name: Mark Deployment success on GitHub
+        run: |
+          curl --location --request POST 'https://api.github.com/repos/kamleshchandnani/rabbit-hole-github-actions/deployments/${{ github.event.deployment.id }}/statuses' \
+          --header 'Authorization: token ${{ github.token }}' \
+          --header 'Accept: application/vnd.github.everest-preview+json' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+            "environment": "staging",
+            "state": "success"
+          }'
+
+  production-deploy:
+    name: Production Deploy
+    runs-on: ubuntu-latest
+    if: github.event.deployment.environment == 'production'
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+      - name: Use Node v12
+        uses: actions/setup-node
+        with:
+          node-version: 12
+      - name: Deploy To Kubernetes Cluster
+        run: echo "deploying to kubernetes"
+      - name: Mark Deployment success on GitHub
+        run: |
+          curl --location --request POST 'https://api.github.com/repos/kamleshchandnani/rabbit-hole-github-actions/deployments/${{ github.event.deployment.id }}/statuses' \
+          --header 'Authorization: token ${{ github.token }}' \
+          --header 'Accept: application/vnd.github.everest-preview+json' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+            "environment": "production",
+            "state": "success"
+          }'
