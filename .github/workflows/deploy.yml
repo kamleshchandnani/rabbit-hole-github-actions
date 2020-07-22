@@ -11,7 +11,7 @@ jobs:
       - name: Checkout Codebase
         uses: actions/checkout@v2
       - name: Use Node v12
-        uses: actions/setup-node
+        uses: actions/setup-node@v1
         with:
           node-version: 12
       - name: Deploy To Kubernetes Cluster
@@ -35,7 +35,7 @@ jobs:
       - name: Checkout Codebase
         uses: actions/checkout@v2
       - name: Use Node v12
-        uses: actions/setup-node
+        uses: actions/setup-node@v1
         with:
           node-version: 12
       - name: Deploy To Kubernetes Cluster
@@ -59,7 +59,7 @@ jobs:
       - name: Checkout Codebase
         uses: actions/checkout@v2
       - name: Use Node v12
-        uses: actions/setup-node
+        uses: actions/setup-node@v1
         with:
           node-version: 12
       - name: Deploy To Kubernetes Cluster
