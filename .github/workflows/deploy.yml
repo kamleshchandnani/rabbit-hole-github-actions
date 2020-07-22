@@ -3,6 +3,35 @@ name: Deploy
 on: deployment
 
 jobs:
+  release-deploy:
+    name: Release Deploy
+    runs-on: ubuntu-latest
+    if: github.event.deployment.environment == 'release'
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+      - name: Use Node v12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Run tests
+        run: yarn test
+      - name: Build Application
+        run: yarn staging:build
+      - name: Deploy to kubernetes
+        run: echo "Deploying to kubernetes cluster/Deploy to s3"
+      - name: Mark the deployment status back on GitHub
+        run: |
+          curl --location --request POST 'https://api.github.com/repos/kamleshchandnani/rabbit-hole-github-actions/deployments/${{ github.event.deployment.id }}/statuses' \
+          --header 'Authorization: token ${{ github.token }}' \
+          --header 'Accept: application/vnd.github.everest-preview+json' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+            "environment": "release",
+            "state": "success"
+          }'
   staging-deploy:
     name: Staging Deploy
     runs-on: ubuntu-latest
@@ -16,13 +45,13 @@ jobs:
           node-version: 12
       - name: Install Dependencies
         run: yarn --frozen-lockfile
-      - name: Test
+      - name: Run tests
         run: yarn test
-      - name: Build
+      - name: Build Application
         run: yarn staging:build
-      - name: Deploy to Kubernetes Cluster
-        run: echo ${{ github.ref }} ${{ github.event.deployment.environment }} ${{ github.event.deployment.id }}
-      - name: Mark Deployment Success on GitHub
+      - name: Deploy to kubernetes
+        run: echo "Deploying to kubernetes cluster/Deploy to s3"
+      - name: Mark the deployment status back on GitHub
         run: |
           curl --location --request POST 'https://api.github.com/repos/kamleshchandnani/rabbit-hole-github-actions/deployments/${{ github.event.deployment.id }}/statuses' \
           --header 'Authorization: token ${{ github.token }}' \
@@ -45,13 +74,13 @@ jobs:
           node-version: 12
       - name: Install Dependencies
         run: yarn --frozen-lockfile
-      - name: Run Tests
+      - name: Run tests
         run: yarn test
-      - name: Build
+      - name: Build Application
         run: yarn production:build
-      - name: Deploy to Kubernetes Cluster
-        run: echo ${{ github.ref }} ${{ github.event.deployment.environment }} ${{ github.event.deployment.id }}
-      - name: Mark Deployment Success on GitHub
+      - name: Deploy to kubernetes
+        run: echo "Deploying to kubernetes cluster/Deploy to s3"
+      - name: Mark the deployment status back on GitHub
         run: |
           curl --location --request POST 'https://api.github.com/repos/kamleshchandnani/rabbit-hole-github-actions/deployments/${{ github.event.deployment.id }}/statuses' \
           --header 'Authorization: token ${{ github.token }}' \

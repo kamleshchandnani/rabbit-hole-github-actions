@@ -11,7 +11,7 @@ const STAGE = process.env.STAGE;
 
 const makeApp = ({ name, version }) => {
   const app = express();
-
+  console.log('test the build workflow');
   // get client ip in req.ip
   app.set('trust proxy', true);
 
