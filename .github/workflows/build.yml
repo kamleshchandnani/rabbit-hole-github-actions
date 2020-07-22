@@ -1,0 +1,92 @@
+name: Build
+
+on:
+  push: [release/*, master]
+
+env:
+  DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
+  DOCKER_HUB_REGISTRY: docker.pkg.github.com
+  APP_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/rabbit-hole-github-actions/frontops-demo
+
+jobs:
+  release-build:
+    name: Release Build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/heads/release/')
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+      - name: Setup Node v12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Run Tests
+        run: yarn test
+      - name: Build Application
+        run: yarn staging:build
+      - name: Build Docker Image
+        run: |
+          docker build . \
+          --file ./Dockerfile \
+          --build-arg STAGE=staging \
+          --tag ${DOCKER_HUB_REGISTRY}/${APP_NAME}-release:${{ github.sha }}
+      - name: Push to Docker Hub
+        run: |
+          docker login ${DOCKER_HUB_REGISTRY} --username ${DOCKER_HUB_USERNAME} --password ${{ secrets.GITHUB_TOKEN }}
+          docker push ${DOCKER_HUB_REGISTRY}/${APP_NAME}-release:${{ github.sha }}
+  staging-build:
+    name: Staging Build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+      - name: Setup Node v12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Run Tests
+        run: yarn test
+      - name: Build Application
+        run: yarn staging:build
+      - name: Build Docker Image
+        run: |
+          docker build . \
+          --file ./Dockerfile \
+          --build-arg STAGE=staging \
+          --tag ${DOCKER_HUB_REGISTRY}/${APP_NAME}-staging:${{ github.sha }}
+      - name: Push to Docker Hub
+        run: |
+          docker login ${DOCKER_HUB_REGISTRY} --username ${DOCKER_HUB_USERNAME} --password ${{ secrets.GITHUB_TOKEN }}
+          docker push ${DOCKER_HUB_REGISTRY}/${APP_NAME}-staging:${{ github.sha }}
+  production-build:
+    name: Production Build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+      - name: Setup Node v12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install Dependencies
+        run: yarn --frozen-lockfile
+      - name: Run Tests
+        run: yarn test
+      - name: Build Application
+        run: yarn production:build
+      - name: Build Docker Image
+        run: |
+          docker build . \
+          --file ./Dockerfile \
+          --build-arg STAGE=production \
+          --tag ${DOCKER_HUB_REGISTRY}/${APP_NAME}-production:${{ github.sha }}
+      - name: Push to Docker Hub
+        run: |
+          docker login ${DOCKER_HUB_REGISTRY} --username ${DOCKER_HUB_USERNAME} --password ${{ secrets.GITHUB_TOKEN }}
+          docker push ${DOCKER_HUB_REGISTRY}/${APP_NAME}-production:${{ github.sha }}
