@@ -7,9 +7,9 @@ jobs:
     name: Validate Source Code
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Checkout Codebase
         uses: actions/checkout@v2
-      - name: Use Node V2
+      - name: Use Node V12
         uses: actions/setup-node@v1
         with:
           node-version: 12
