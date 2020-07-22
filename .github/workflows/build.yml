@@ -32,11 +32,11 @@ jobs:
           docker build . \
           --file ./Dockerfile \
           --build-arg STAGE=staging \
-          --tag ${DOCKER_HUB_REGISTRY}/${APP_NAME}/release:${{ github.sha }}
+          --tag ${DOCKER_HUB_REGISTRY}/${APP_NAME}-release:${{ github.sha }}
       - name: Push to Docker Hub
         run: |
           docker login ${DOCKER_HUB_REGISTRY} --username ${DOCKER_HUB_USERNAME} --password ${{ secrets.GITHUB_TOKEN }}
-          docker push ${DOCKER_HUB_REGISTRY}/${APP_NAME}/release:${{ github.sha }}
+          docker push ${DOCKER_HUB_REGISTRY}/${APP_NAME}-release:${{ github.sha }}
 
   staging-build:
     name: Staging Build
@@ -60,11 +60,11 @@ jobs:
           docker build . \
           --file ./Dockerfile \
           --build-arg STAGE=staging \
-          --tag ${DOCKER_HUB_REGISTRY}/${APP_NAME}/staging:${{ github.sha }}
+          --tag ${DOCKER_HUB_REGISTRY}/${APP_NAME}-staging:${{ github.sha }}
       - name: Push to Docker Hub
         run: |
           docker login ${DOCKER_HUB_REGISTRY} --username ${DOCKER_HUB_USERNAME} --password ${{ secrets.GITHUB_TOKEN }}
-          docker push ${DOCKER_HUB_REGISTRY}/${APP_NAME}/staging:${{ github.sha }}
+          docker push ${DOCKER_HUB_REGISTRY}/${APP_NAME}-staging:${{ github.sha }}
 
   production-build:
     name: Production Build
@@ -88,8 +88,8 @@ jobs:
           docker build . \
           --file ./Dockerfile \
           --build-arg STAGE=staging \
-          --tag ${DOCKER_HUB_REGISTRY}/${APP_NAME}/production:${{ github.sha }}
+          --tag ${DOCKER_HUB_REGISTRY}/${APP_NAME}-production:${{ github.sha }}
       - name: Push to Docker Hub
         run: |
           docker login ${DOCKER_HUB_REGISTRY} --username ${DOCKER_HUB_USERNAME} --password ${{ secrets.GITHUB_TOKEN }}
-          docker push ${DOCKER_HUB_REGISTRY}/${APP_NAME}/production:${{ github.sha }}
+          docker push ${DOCKER_HUB_REGISTRY}/${APP_NAME}-production:${{ github.sha }}
