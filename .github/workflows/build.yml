@@ -1,7 +1,8 @@
 name: Build
 
 on:
-  push: [release/*, master]
+  push:
+    branches: [release/*, master]
 
 env:
   DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
