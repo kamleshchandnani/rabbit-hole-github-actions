@@ -1,6 +1,6 @@
 name: Validate
 
-on: [pull_request, push]
+on: [pull_request]
 
 jobs:
   validate:
@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Checkout Codebase
         uses: actions/checkout@v2
-      - name: Use Node v12
+      - name: Use Node V12
         uses: actions/setup-node@v1
         with:
           node-version: 12
