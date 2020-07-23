@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [release/*, master]
+    branches: [main]
 
 env:
   DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
@@ -10,84 +10,103 @@ env:
   APP_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/rabbit-hole-github-actions/frontops-demo
 
 jobs:
-  release-build:
-    name: Release Build
+  version-bump:
+    name: Version Bump
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/heads/release/')
     steps:
       - name: Checkout Codebase
         uses: actions/checkout@v2
-      - name: Setup Node v12
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - name: Install Dependencies
-        run: yarn --frozen-lockfile
-      - name: Run Tests
-        run: yarn test
-      - name: Build Application
-        run: yarn staging:build
-      - name: Build Docker Image
-        run: |
-          docker build . \
-          --file ./Dockerfile \
-          --build-arg STAGE=staging \
-          --tag ${DOCKER_HUB_REGISTRY}/${APP_NAME}-release:${{ github.sha }}
-      - name: Push to Docker Hub
-        run: |
-          docker login ${DOCKER_HUB_REGISTRY} --username ${DOCKER_HUB_USERNAME} --password ${{ secrets.GITHUB_TOKEN }}
-          docker push ${DOCKER_HUB_REGISTRY}/${APP_NAME}-release:${{ github.sha }}
-  staging-build:
-    name: Staging Build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - name: Checkout Codebase
-        uses: actions/checkout@v2
-      - name: Setup Node v12
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - name: Install Dependencies
-        run: yarn --frozen-lockfile
-      - name: Run Tests
-        run: yarn test
-      - name: Build Application
-        run: yarn staging:build
-      - name: Build Docker Image
-        run: |
-          docker build . \
-          --file ./Dockerfile \
-          --build-arg STAGE=staging \
-          --tag ${DOCKER_HUB_REGISTRY}/${APP_NAME}-staging:${{ github.sha }}
-      - name: Push to Docker Hub
-        run: |
-          docker login ${DOCKER_HUB_REGISTRY} --username ${DOCKER_HUB_USERNAME} --password ${{ secrets.GITHUB_TOKEN }}
-          docker push ${DOCKER_HUB_REGISTRY}/${APP_NAME}-staging:${{ github.sha }}
-  production-build:
-    name: Production Build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
-    steps:
-      - name: Checkout Codebase
-        uses: actions/checkout@v2
-      - name: Setup Node v12
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
       - name: Install Dependencies
         run: yarn --frozen-lockfile
       - name: Run Tests
         run: yarn test
       - name: Build Application
         run: yarn production:build
+      - name: Bump package.json Version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+        run: |
+          git config --global user.email "kamlesh.chandnani@gmail.com"
+          git config --global user.name "kamleshchandnani"
+          yarn version:bump
+      - name: Upload Version Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: metadata
+          path: package.json
+
+  staging-build:
+    name: Staging Build
+    runs-on: ubuntu-latest
+    needs: version-bump
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+      - name: Download Version Artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: metadata
+      - name: Set Version
+        run: |
+          VERSION=staging-v$(cat metadata/package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]')
+          cat metadata/package.json > package.json
+          echo "::set-env name=VERSION::$VERSION"
+      - name: Build Docker Image
+        run: |
+          docker build . \
+          --file ./Dockerfile \
+          --build-arg STAGE=staging \
+          --tag ${DOCKER_HUB_REGISTRY}/${APP_NAME}-staging:${VERSION}
+      - name: Push to Docker Hub
+        run: |
+          docker login ${DOCKER_HUB_REGISTRY} --username ${DOCKER_HUB_USERNAME} --password ${{ secrets.GITHUB_TOKEN }}
+          docker push ${DOCKER_HUB_REGISTRY}/${APP_NAME}-staging:${VERSION}
+
+  production-build:
+    name: Production Build
+    runs-on: ubuntu-latest
+    needs: version-bump
+    steps:
+      - name: Checkout Codebase
+        uses: actions/checkout@v2
+      - name: Download Version Artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: metadata
+      - name: Set Version
+        run: |
+          VERSION=production-v$(cat metadata/package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]')
+          cat metadata/package.json > package.json
+          echo "::set-env name=VERSION::$VERSION"
       - name: Build Docker Image
         run: |
           docker build . \
           --file ./Dockerfile \
           --build-arg STAGE=production \
-          --tag ${DOCKER_HUB_REGISTRY}/${APP_NAME}-production:${{ github.sha }}
+          --tag ${DOCKER_HUB_REGISTRY}/${APP_NAME}-production:${VERSION}
       - name: Push to Docker Hub
         run: |
           docker login ${DOCKER_HUB_REGISTRY} --username ${DOCKER_HUB_USERNAME} --password ${{ secrets.GITHUB_TOKEN }}
-          docker push ${DOCKER_HUB_REGISTRY}/${APP_NAME}-production:${{ github.sha }}
+          docker push ${DOCKER_HUB_REGISTRY}/${APP_NAME}-production:${VERSION}
+
+  version-publish:
+    name: Version Publish
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+    needs: [staging-build, production-build]
+    steps:
+      - name: Checkout Codebase
+        steps: actions/checkout@v2
+      - name: Use Node v12
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Bump package.json Version
+        run: |
+          git config --global user.email "kamlesh.chandnani@gmail.com"
+          git config --global user.name "kamleshchandnani"
+          yarn version:bump
+      - name: Publish Version
+        run: |
+          yarn version:publish
