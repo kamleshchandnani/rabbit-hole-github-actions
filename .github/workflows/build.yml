@@ -42,7 +42,6 @@ jobs:
   staging-build:
     name: Staging Build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout Codebase
         uses: actions/checkout@v2
@@ -69,7 +68,6 @@ jobs:
   production-build:
     name: Production Build
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
     steps:
       - name: Checkout Codebase
         uses: actions/checkout@v2
