@@ -13,11 +13,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12
-      - name: Install Dependencies
+      - name: Install deps
         run: yarn --frozen-lockfile
-      - name: Lint Source Code
+      - name: List source code
         run: yarn lint
-      - name: Run Tests
+      - name: Run tests
         run: yarn test
-      - name: Build Application
-        run: yarn production:build
+      - name: Build application
+        run: yarn production
