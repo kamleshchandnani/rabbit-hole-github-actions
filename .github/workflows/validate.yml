@@ -20,4 +20,4 @@ jobs:
       - name: Run tests
         run: yarn test
       - name: Build application
-        run: yarn production
+        run: yarn production:build
